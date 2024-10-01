@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from wordcloud import WordCloud
+from collections import Counter
+
 
 # PDF extraction and analysis functions
 
@@ -106,6 +108,19 @@ def plot_word_cloud(text):
     plt.title("Word Cloud")
     plt.show()
 
+def plot_top_20_words_pie(text):
+    words = text.split()
+    word_freq = Counter(words)
+    most_common_words = word_freq.most_common(20)
+
+    labels, values = zip(*most_common_words)
+
+    plt.figure(figsize=(10, 7))
+    plt.pie(values, labels=labels, autopct='%1.1f%%', startangle=140)
+    plt.axis('equal')
+    plt.title("Top 20 Most Used Words")
+    plt.show()
+
 def plot_character_frequency_pie(frequencies):
     labels, values = zip(*frequencies.items())
     plt.figure(figsize=(10, 7))
@@ -145,16 +160,20 @@ def plot_word_density_heatmap(word_counts):
 
 def analyze_pdf(pdf_file):
     text = extract_text_from_pdf(pdf_file)
+
+    # Character frequency
     char_freq = character_frequency(text)
+    print("Character frequency:", char_freq)
+    plot_character_frequency(char_freq)
+
+    # First word of each chapter
+    first_words = first_word_of_chapters(text)
+    print("First words of chapters:", first_words)
+
+    # Words per page
     words_per_page_list = words_per_page(pdf_file)
-
-    # # Character frequency
-    # print("Character frequency:", char_freq)
-    # plot_character_frequency(char_freq)
-
-    # # Words per page
-    # print("Words per page:", words_per_page_list)
-    # plot_words_per_page(words_per_page_list)
+    print("Words per page:", words_per_page_list)
+    plot_words_per_page(words_per_page_list)
 
     # Word cloud
     plot_word_cloud(text)
@@ -171,6 +190,10 @@ def analyze_pdf(pdf_file):
     # Word density heatmap
     plot_word_density_heatmap(words_per_page_list)
 
+    # Top 20 words pie chart
+    plot_top_20_words_pie(text)
+
 # Usage
-pdf_file_path = "C:/Users/lucke/Downloads/The-Holy-Bible-King-James-Version.pdf"  # Replace with your PDF file path
+# pdf_file_path = "C:/Users/lucke/Downloads/The-Holy-Bible-King-James-Version.pdf"  # Replace with your PDF file path
+pdf_file_path = "C:/Users/lucke/Downloads/quran-english-translation-clearquran-edition-allah.pdf"  # Replace with your PDF file path
 analyze_pdf(pdf_file_path)
