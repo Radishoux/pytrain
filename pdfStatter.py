@@ -9,7 +9,6 @@ from tqdm import tqdm
 from wordcloud import WordCloud
 from collections import Counter
 
-
 # PDF extraction and analysis functions
 
 def extract_text_from_pdf(pdf_file):

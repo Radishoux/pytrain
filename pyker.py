@@ -47,8 +47,6 @@ class Card:
     def __ne__(self, other):
         return self.rank != other.rank
 
-
-
 # Deck Class: represents a deck of 52 cards
 class Deck:
     suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
@@ -83,55 +81,56 @@ class Player:
         return ', '.join(str(card) for card in self.hand)
 
 def play_game(number_of_players, money_entrance, cost_per_hand):
-    # Initialize deck and players
-
+    # Initialize players
     players = [Player(f"Player {i+1}", money_entrance) for i in range(number_of_players)]
 
     while all(player.balance >= cost_per_hand for player in players):
-        deck = Deck()
-        deck.shuffle()
-        # Players pay the cost per hand
-        for player in players:
-            player.balance -= cost_per_hand
-        # Draw cards for each player
-        for player in players:
-            player.draw_cards(deck)
-        # Evaluate each player's hand
-        for player in players:
-            evaluate_hand(player)
-            print(f"{player.name} has: {player.hand_value} ({player.show_hand()})")
+      # Initialize deck and shuffle
+      deck = Deck()
+      deck.shuffle()
+      # Players pay the cost per hand
+      for player in players:
+          player.balance -= cost_per_hand
+      # Draw cards for each player
+      for player in players:
+          player.draw_cards(deck)
+      # Evaluate each player's hand
+      for player in players:
+          evaluate_hand(player)
+          print(f"{player.name} has: {player.hand_value} ({player.show_hand()})")
 
-        # Find the winner(s) of the hand
-        max_hand_value = max(player.hand_value for player in players)
-        winners = [player for player in players if player.hand_value == max_hand_value]
-        if len(winners) == 1:
-            winner = winners[0]
-            winner.balance += sum(player.balance for player in players)
-            print(f"{winner.name} wins the hand!")
-            print(f"Balances: {[f'{player.name}: {player.balance}' for player in players]}")
-        else:
-            # If there is a tie, compare the mattering cards
-            for winner in winners:
-                print(f"{winner.name} ties with: {', '.join(str(card) for card in winner.concerned_cards)}")
+      # Find the winner(s) of the hand
+      max_hand_value = max(player.hand_value for player in players)
+      winners = [player for player in players if player.hand_value == max_hand_value]
+      if len(winners) == 1:
+          winner = winners[0]
+          winner.balance += cost_per_hand * len(players)
+          print(f"{winner.name} wins the hand!")
+          print(f"Balances: {[f'{player.name}: {player.balance}' for player in players]}")
+      else:
+          # If there is a tie, compare the mattering cards
+          for winner in winners:
+              print(f"{winner.name} ties with: {', '.join(str(card) for card in winner.concerned_cards)}")
+
+          # Check that at least one player has mattering cards
+          if any(player.concerned_cards for player in winners):
             # Find the winner(s) based on the mattering cards
             max_mattering_card = max(max(player.concerned_cards, key=lambda card: card.rank) for player in winners)
             winners = [player for player in winners if max(player.concerned_cards, key=lambda card: card.rank) == max_mattering_card]
             if len(winners) == 1:
                 winner = winners[0]
-                winner.balance += sum(player.balance for player in players)
+                winner.balance += cost_per_hand * len(players)
                 print(f"{winner.name} wins the hand!")
                 print(f"Balances: {[f'{player.name}: {player.balance}' for player in players]}")
-            else:
-                max_rest_card = max(max(player.rest_cards, key=lambda card: card.rank) for player in winners)
-                winner = [player for player in winners if max(player.rest_cards, key=lambda card: card.rank) == max_rest_card][0]
-                winner.balance += sum(player.balance for player in players)
-                print(f"{winner.name} wins the hand!")
-                print(f"Balances: {[f'{player.name}: {player.balance}' for player in players]}")
+          else:
+              max_rest_card = max(max(player.rest_cards, key=lambda card: card.rank) for player in winners)
+              winner = [player for player in winners if max(player.rest_cards, key=lambda card: card.rank) == max_rest_card][0]
+              winner.balance += cost_per_hand * len(players)
+              print(f"{winner.name} wins the hand!")
+              print(f"Balances: {[f'{player.name}: {player.balance}' for player in players]}")
 
     print("Game Over!")
 
-def compare_cards(card1, card2):
-    return card1.rank - card2.rank
 def contains_straight_flush(hand):
     suits = {card.suit for card in hand}
     if len(suits) == 1:
